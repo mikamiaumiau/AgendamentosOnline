@@ -33,27 +33,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalLoginCliente = document.getElementById('modal-login-cliente');
         let ultimoIdAgendado = null;
 
-        inputData.setAttribute('min', new Date().toISOString().split('T')[0]);
+        if (inputData) {
+            inputData.setAttribute('min', new Date().toISOString().split('T')[0]);
+        }
+
         verificarSessaoCliente();
 
-        document.getElementById('btn-abrir-login-cliente').onclick = () => modalLoginCliente.style.display = 'flex';
-        document.getElementById('btn-fechar-login-cliente').onclick = () => modalLoginCliente.style.display = 'none';
+        const btnAbrirLogin = document.getElementById('btn-abrir-login-cliente');
+        if (btnAbrirLogin && modalLoginCliente) {
+            btnAbrirLogin.onclick = () => modalLoginCliente.style.display = 'flex';
+        }
 
-        document.getElementById('form-login-cliente').onsubmit = (e) => {
-            e.preventDefault();
-            const usuario = {
-                nome: document.getElementById('login-cliente-nome').value.trim(),
-                email: document.getElementById('login-cliente-email').value.trim().toLowerCase()
+        const btnFecharLogin = document.getElementById('btn-fechar-login-cliente');
+        if (btnFecharLogin && modalLoginCliente) {
+            btnFecharLogin.onclick = () => modalLoginCliente.style.display = 'none';
+        }
+
+        const formLoginCliente = document.getElementById('form-login-cliente');
+        if (formLoginCliente) {
+            formLoginCliente.onsubmit = (e) => {
+                e.preventDefault();
+                const usuario = {
+                    nome: document.getElementById('login-cliente-nome').value.trim(),
+                    email: document.getElementById('login-cliente-email').value.trim().toLowerCase()
+                };
+                localStorage.setItem('clienteLogado', JSON.stringify(usuario));
+                if (modalLoginCliente) modalLoginCliente.style.display = 'none';
+                verificarSessaoCliente();
             };
-            localStorage.setItem('clienteLogado', JSON.stringify(usuario));
-            modalLoginCliente.style.display = 'none';
-            verificarSessaoCliente();
-        };
+        }
 
-        document.getElementById('btn-sair-cliente').onclick = () => {
-            localStorage.removeItem('clienteLogado');
-            verificarSessaoCliente();
-        };
+        const btnSairCliente = document.getElementById('btn-sair-cliente');
+        if (btnSairCliente) {
+            btnSairCliente.onclick = () => {
+                localStorage.removeItem('clienteLogado');
+                verificarSessaoCliente();
+            };
+        }
 
         function verificarSessaoCliente() {
             const usuario = JSON.parse(localStorage.getItem('clienteLogado'));
@@ -61,25 +77,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnLogin = document.getElementById('btn-abrir-login-cliente');
 
             if (usuario) {
-                btnLogin.textContent = 'Olá, ' + usuario.nome.split(' ')[0];
-                document.getElementById('cliente').value = usuario.nome;
-                document.getElementById('email-cliente').value = usuario.email;
-                document.getElementById('subtitulo-cliente-logado').textContent = 'Conta: ' + usuario.email;
-                painelMeus.style.display = 'block';
+                if (btnLogin) btnLogin.textContent = 'Olá, ' + usuario.nome.split(' ')[0];
+                const campoCliente = document.getElementById('cliente');
+                const campoEmail = document.getElementById('email-cliente');
+                const subtitulo = document.getElementById('subtitulo-cliente-logado');
+
+                if (campoCliente) campoCliente.value = usuario.nome;
+                if (campoEmail) campoEmail.value = usuario.email;
+                if (subtitulo) subtitulo.textContent = 'Conta: ' + usuario.email;
+                if (painelMeus) painelMeus.style.display = 'block';
                 renderizarMeusHorarios(usuario.email);
             } else {
-                btnLogin.textContent = 'Entrar / Meus Horários';
-                painelMeus.style.display = 'none';
+                if (btnLogin) btnLogin.textContent = 'Entrar / Meus Horários';
+                if (painelMeus) painelMeus.style.display = 'none';
             }
         }
 
         function renderizarMeusHorarios(email) {
             const tbody = document.getElementById('tabela-meus-horarios');
             const vazio = document.getElementById('vazio-meus-horarios');
+            if (!tbody) return;
+
             const meus = obterAgendamentos().filter(item => item.email === email);
 
             tbody.innerHTML = '';
-            vazio.style.display = meus.length === 0 ? 'block' : 'none';
+            if (vazio) vazio.style.display = meus.length === 0 ? 'block' : 'none';
 
             meus.forEach(item => {
                 let badge = 'badge-warning';
@@ -96,14 +118,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 tbody.appendChild(tr);
             });
         }
-        selectServico.onchange = () => {
-            const opt = selectServico.options[selectServico.selectedIndex];
-            const preco = parseFloat(opt.getAttribute('data-preco')) || 0;
-            inputValor.value = preco;
-            displayValorTotal.textContent = formatarMoeda(preco);
-            displayValorSinal.textContent = formatarMoeda(preco * 0.30);
-        };
 
+        function atualizarCalculoServico() {
+            if (!selectServico || selectServico.selectedIndex === -1) return;
+
+            const opt = selectServico.options[selectServico.selectedIndex];
+            let preco = parseFloat(opt.getAttribute('data-preco'));
+
+            if (isNaN(preco)) {
+                const match = opt.text.match(/R\$\s*([\d.,]+)/);
+                if (match && match[1]) {
+                    preco = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+                } else {
+                    preco = 0;
+                }
+            }
+
+            if (inputValor) inputValor.value = preco;
+            if (displayValorTotal) displayValorTotal.textContent = formatarMoeda(preco);
+            if (displayValorSinal) displayValorSinal.textContent = formatarMoeda(preco * 0.30);
+        }
+
+        if (selectServico) {
+            selectServico.addEventListener('change', atualizarCalculoServico);
+            atualizarCalculoServico();
+        }
         formAgendamento.onsubmit = (e) => {
             e.preventDefault();
             const dataSel = document.getElementById('data').value;
@@ -117,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const nome = document.getElementById('cliente').value.trim();
             const email = document.getElementById('email-cliente').value.trim().toLowerCase();
-            const valor = parseFloat(inputValor.value) || 0;
+            const valor = parseFloat(inputValor ? inputValor.value : 0) || 0;
             const sinal = valor * 0.30;
 
             const novo = {
@@ -139,38 +178,47 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('clienteLogado', JSON.stringify({ nome: nome, email: email }));
 
             ultimoIdAgendado = novo.id;
-            modalValorSinal.textContent = formatarMoeda(sinal);
-            modalPix.style.display = 'flex';
+            if (modalValorSinal) modalValorSinal.textContent = formatarMoeda(sinal);
+            if (modalPix) modalPix.style.display = 'flex';
 
             formAgendamento.reset();
-            inputValor.value = 0;
-            displayValorTotal.textContent = 'R$ 0,00';
-            displayValorSinal.textContent = 'R$ 0,00';
+            atualizarCalculoServico();
             verificarSessaoCliente();
         };
 
-        document.getElementById('btn-copiar-pix').onclick = () => {
-            const pix = document.getElementById('pix-codigo');
-            pix.select();
-            navigator.clipboard.writeText(pix.value);
-            alert('Código Pix copiado!');
-        };
+        const btnCopiarPix = document.getElementById('btn-copiar-pix');
+        if (btnCopiarPix) {
+            btnCopiarPix.onclick = () => {
+                const pix = document.getElementById('pix-codigo');
+                if (pix) {
+                    pix.select();
+                    navigator.clipboard.writeText(pix.value);
+                    alert('Código Pix copiado!');
+                }
+            };
+        }
 
-        document.getElementById('btn-confirmar-pix').onclick = () => {
-            if (ultimoIdAgendado) {
-                const lista = obterAgendamentos().map(i => i.id === ultimoIdAgendado ? { ...i, status: 'Confirmado (Pix)' } : i);
-                salvarAgendamentos(lista);
-            }
-            modalPix.style.display = 'none';
-            verificarSessaoCliente();
-            alert('Agendamento confirmado com sucesso!');
-        };
+        const btnConfirmarPix = document.getElementById('btn-confirmar-pix');
+        if (btnConfirmarPix) {
+            btnConfirmarPix.onclick = () => {
+                if (ultimoIdAgendado) {
+                    const lista = obterAgendamentos().map(i => i.id === ultimoIdAgendado ? { ...i, status: 'Confirmado (Pix)' } : i);
+                    salvarAgendamentos(lista);
+                }
+                if (modalPix) modalPix.style.display = 'none';
+                verificarSessaoCliente();
+                alert('Agendamento confirmado com sucesso!');
+            };
+        }
 
-        document.getElementById('btn-fechar-modal').onclick = () => {
-            modalPix.style.display = 'none';
-            verificarSessaoCliente();
-            alert('Pré-agendamento realizado!');
-        };
+        const btnFecharModal = document.getElementById('btn-fechar-modal');
+        if (btnFecharModal) {
+            btnFecharModal.onclick = () => {
+                if (modalPix) modalPix.style.display = 'none';
+                verificarSessaoCliente();
+                alert('Pré-agendamento realizado!');
+            };
+        }
     }
 
     function iniciarAreaAdmin() {
@@ -196,19 +244,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        document.getElementById('btn-logout-admin').onclick = () => {
-            sessionStorage.removeItem('adminAutenticado');
-            window.location.reload();
-        };
+        const btnLogoutAdmin = document.getElementById('btn-logout-admin');
+        if (btnLogoutAdmin) {
+            btnLogoutAdmin.onclick = () => {
+                sessionStorage.removeItem('adminAutenticado');
+                window.location.reload();
+            };
+        }
 
         function liberarAdmin() {
-            telaLogin.style.display = 'none';
-            conteudoAdmin.style.display = 'block';
+            if (telaLogin) telaLogin.style.display = 'none';
+            if (conteudoAdmin) conteudoAdmin.style.display = 'block';
             atualizarPainelAdmin();
         }
 
-        busca.oninput = renderizarTabelaAdmin;
-        filtro.onchange = renderizarTabelaAdmin;
+        if (busca) busca.oninput = renderizarTabelaAdmin;
+        if (filtro) filtro.onchange = renderizarTabelaAdmin;
 
         function atualizarPainelAdmin() {
             const lista = obterAgendamentos();
@@ -224,15 +275,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderizarTabelaAdmin() {
+            if (!tabela) return;
             tabela.innerHTML = '';
             const lista = obterAgendamentos().sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+            const termoBusca = busca ? busca.value.toLowerCase() : '';
+            const statusFiltro = filtro ? filtro.value : 'Todos';
+
             const filtrados = lista.filter(i => {
-                const okNome = i.cliente.toLowerCase().includes(busca.value.toLowerCase());
-                const okStatus = filtro.value === 'Todos' || i.status === filtro.value;
+                const okNome = i.cliente.toLowerCase().includes(termoBusca);
+                const okStatus = statusFiltro === 'Todos' || i.status === statusFiltro;
                 return okNome && okStatus;
             });
 
-            vazio.style.display = filtrados.length === 0 ? 'block' : 'none';
+            if (vazio) vazio.style.display = filtrados.length === 0 ? 'block' : 'none';
 
             filtrados.forEach(item => {
                 let badge = 'badge-warning';
