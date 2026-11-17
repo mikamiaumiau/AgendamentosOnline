@@ -127,8 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isNaN(preco)) {
                 const match = opt.text.match(/R\$\s*([\d.,]+)/);
-                if (match && match[1]) {
+                if if (match && match[1]) {
                     preco = parseFloat(match[1].replace(/\./g, '').replace(',', '.'));
+                }
+                
                 } else {
                     preco = 0;
                 }
