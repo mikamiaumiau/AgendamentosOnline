@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Studio & Barbearia Pro</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+    <div id="tela-login-admin" class="login-screen">
+        <div class="card login-card">
+            <div class="client-header">
+                <span class="badge-admin">Área Administrativa</span>
+                <h2>Acesso do Proprietário</h2>
+                <p>Faça login para gerenciar sua agenda, orçamentos e faturamento.</p>
+            </div>
+
+            <form id="form-login-admin">
+                <div class="form-group">
+                    <label class="form-label">E-mail Profissional</label>
+                    <input type="email" id="admin-email" class="form-control" placeholder="admin@studio.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" id="admin-senha" class="form-control" placeholder="••••••" required>
+                </div>
+                <div class="demo-hint">
+                    <strong>Dados para teste (TCC):</strong><br>
+                    E-mail: <code>admin@studio.com</code> | Senha: <code>123456</code>
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar no Painel</button>
+                <a href="index.html" class="btn btn-secondary" style="text-decoration: none;">← Voltar para o Site do Cliente</a>
+            </form>
+        </div>
+    </div>
+
+    <div id="conteudo-admin" style="display: none;">
+        <header class="topbar">
+            <div class="container topbar-content">
+                <div>
+                    <h1>Painel de Gestão Administrativa</h1>
+                    <p>Controle de Agenda, Orçamentos e Sinais Pix</p>
+                </div>
+                <div class="user-nav">
+                    <a href="index.html" class="btn-header-outline" style="text-decoration: none;">Ver Site Público</a>
+                    <button type="button" id="btn-logout-admin" class="btn-sm-danger">Sair</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Agendamentos Totais</span>
+                    <strong class="stat-value" id="stat-total">0</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Pendentes (Aguardando)</span>
+                    <strong class="stat-value text-warning" id="stat-pendentes">0</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Sinal Pix Garantido (30%)</span>
+                    <strong class="stat-value text-primary" id="stat-sinal">R$ 0,00</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Faturamento Previsto</span>
+                    <strong class="stat-value text-success" id="stat-faturamento">R$ 0,00</strong>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-header-actions">
+                    <div class="card-title" style="margin-bottom: 0;">Agenda & Controle Financeiro</div>
+                    <div class="filter-group">
+                        <input type="text" id="busca-cliente" class="form-control form-control-sm" placeholder="Buscar cliente...">
+                        <select id="filtro-status" class="form-control form-control-sm">
+                            <option value="Todos">Todos os Status</option>
+                            <option value="Pendente">Pendentes</option>
+                            <option value="Confirmado (Pix)">Confirmados (Pix)</option>
+                            <option value="Concluído">Concluídos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Data / Hora</th>
+                                <th>Cliente</th>
+                                <th>Serviço / Obs</th>
+                                <th>Orçamento</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-corpo">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="mensagem-vazia" class="empty-state" style="display: none;">
+                    Nenhum agendamento encontrado para este filtro.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="Script.js"></script>
+</body>
+</html>

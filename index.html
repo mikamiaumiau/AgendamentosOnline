@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio & Barbearia Pro | Agendamento Online</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="container topbar-content">
+            <div>
+                <h1>Studio & Barbearia Pro</h1>
+                <p>Agendamento Online 24h</p>
+            </div>
+            
+            <div id="area-usuario-header" class="user-nav">
+                <button type="button" id="btn-abrir-login-cliente" class="btn-header-outline">Entrar / Meus Horários</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="painel-meus-agendamentos" class="card mb-24" style="display: none;">
+            <div class="table-header-actions">
+                <div>
+                    <div class="card-title" style="margin-bottom: 4px;">Meus Agendamentos</div>
+                    <small id="subtitulo-cliente-logado" style="color: var(--text-muted);"></small>
+                </div>
+                <button type="button" id="btn-sair-cliente" class="btn-sm-danger">Sair da Conta</button>
+            </div>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Serviço</th>
+                            <th>Valor Total</th>
+                            <th>Sinal (30%)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-meus-horarios"></tbody>
+                </table>
+            </div>
+            <div id="vazio-meus-horarios" class="empty-state" style="display: none;">
+                Você ainda não possui horários marcados nesta conta.
+            </div>
+        </div>
+
+        <section class="client-wrapper">
+            <div class="card client-card">
+                <div class="client-header">
+                    <span class="badge-live">● Aberto para agendamentos</span>
+                    <h2>Agende seu horário</h2>
+                    <p>Escolha o serviço, veja o orçamento na hora e garanta sua vaga.</p>
+                </div>
+
+                <form id="form-agendamento">
+                    <div class="form-group">
+                        <label class="form-label">Seu Nome Completo</label>
+                        <input type="text" id="cliente" class="form-control" placeholder="Ex: Maria Silva" required>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Seu E-mail (Login)</label>
+                            <input type="email" id="email-cliente" class="form-control" placeholder="maria@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Seu WhatsApp</label>
+                            <input type="tel" id="telefone" class="form-control" placeholder="11999999999" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Escolha o Serviço</label>
+                        <select id="servico" class="form-control" required>
+                            <option value="" data-preco="0">Selecione um procedimento...</option>
+                            <option value="Corte de Cabelo" data-preco="45.00">Corte de Cabelo (40 min) - R$ 45,00</option>
+                            <option value="Barba Completa" data-preco="35.00">Barba Completa (30 min) - R$ 35,00</option>
+                            <option value="Combo Corte + Barba" data-preco="70.00">Combo Corte + Barba (1h 10min) - R$ 70,00</option>
+                            <option value="Limpeza de Pele" data-preco="120.00">Limpeza de Pele Profunda (1h) - R$ 120,00</option>
+                            <option value="Design de Sobrancelhas" data-preco="40.00">Design de Sobrancelhas (30 min) - R$ 40,00</option>
+                            <option value="Manicure e Pedicure" data-preco="65.00">Manicure e Pedicure (1h 30min) - R$ 65,00</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Data Desejada</label>
+                            <input type="date" id="data" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Horário</label>
+                            <input type="time" id="hora" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="budget-summary">
+                        <div class="budget-row">
+                            <span>Valor Total do Serviço:</span>
+                            <strong id="display-valor-total">R$ 0,00</strong>
+                        </div>
+                        <div class="budget-row highlight">
+                            <span>Sinal de Reserva (30% via Pix):</span>
+                            <strong id="display-valor-sinal">R$ 0,00</strong>
+                        </div>
+                        <input type="hidden" id="valor" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Observações (Opcional)</label>
+                        <input type="text" id="observacao" class="form-control" placeholder="Ex: Cabelo longo, alergia a algum produto...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Confirmar Agendamento</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-discreto">
+        <p>© 2026 Studio & Barbearia Pro • <a href="admin.html">Acesso Restrito (Profissional)</a></p>
+    </footer>
+
+    <div id="modal-login-cliente" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h3>👤 Área do Cliente</h3>
+            <p class="modal-desc">Entre com seu e-mail para acompanhar seus agendamentos ou criar um acesso rápido.</p>
+            
+            <form id="form-login-cliente">
+                <div class="form-group">
+                    <label class="form-label">Seu Nome</label>
+                    <input type="text" id="login-cliente-nome" class="form-control" placeholder="Seu nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seu E-mail</label>
+                    <input type="email" id="login-cliente-email" class="form-control" placeholder="seu@email.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Acessar Minha Conta</button>
+                <button type="button" id="btn-fechar-login-cliente" class="btn btn-secondary">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-pix" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h3>Garanta seu Horário via Pix</h3>
+            <p class="modal-desc">Para confirmar sua reserva e evitar bloqueios na agenda, pague o sinal de <strong>30%</strong>:</p>
+            
+            <div class="pix-info">
+                <span>Valor do Sinal:</span>
+                <strong id="modal-valor-sinal">R$ 0,00</strong>
+            </div>
+
+            <div class="pix-box">
+                <small>Código Pix Copia e Cola:</small>
+                <input type="text" id="pix-codigo" class="form-control" readonly value="00020126580014BR.GOV.BCB.PIX0136agenda-studio-beleza-pix-reserva5204000053039865802BR5920STUDIO BELEZA PRO6009SAO PAULO62070503***6304E2A1">
+                <button type="button" id="btn-copiar-pix" class="btn btn-outline">Copiar Código Pix</button>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="btn-confirmar-pix" class="btn btn-success">Já fiz o Pix (Confirmar Vaga)</button>
+                <button type="button" id="btn-fechar-modal" class="btn btn-secondary">Pagar no Local (Sujeito a confirmação)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Script.js"></script>
+</body>
+</html>
